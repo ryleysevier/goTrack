@@ -1,0 +1,190 @@
+<div ng-controller="StatCtlr as ctrl" layout="column" ng-cloak class="md-inline-form">
+
+    <md-card>
+        <md-card-title>
+            Submit New Information
+        </md-card-title>
+
+        <md-card-content>
+            <div>
+                <form name="userForm">
+
+                    <div layout-gt-xs="row">
+                        <md-input-container class="md-block" flex-gt-xs>
+                            <md-icon ng-show="loaded" md-svg-src="{{newEntry.icon}}"
+                                     aria-label="User Icon">
+                            </md-icon>
+                            <label>Trainer</label>
+                            <input ng-model="newEntry.trainer" disabled>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-xs>
+                            <md-icon ng-show="loaded" md-svg-src="{{newEntry.faction}}"
+                                     aria-label="Faction">
+                            </md-icon>
+                            <label>Level</label>
+                            <input type="number" ng-model="newEntry.level">
+
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-autocomplete flex
+                                ng-disabled="newEntry.pokemonDisabled"
+                                md-selected-item="ctrl.pokemonObj"
+                                md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                                md-search-text="ctrl.pokemonSearchText"
+                                md-selected-item-change="ctrl.selectedItemChange(item)"
+                                md-items="item in ctrl.pokemonQuerySearch(ctrl.pokemonSearchText)"
+                                md-item-text="item.name"
+                                md-min-length="0"
+                                placeholder="Pokemon"
+                                md-menu-class="autocomplete-pokemon-template">
+                            <md-item-template>
+                                <span  class="item-title"  md-highlight-flags="^i">
+                                    <md-icon md-svg-icon="img/pokemon151/vectorized/{{item.img}}.svg"></md-icon>
+                                    <strong>{{item.pokedex  | numberFixedLen:3}}   </strong>{{item.name}}
+
+                                </span>
+                            </md-item-template>
+                        </md-autocomplete>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block">
+                            <label>Nickname</label>
+                            <input ng-model="newEntry.nickname">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Combat Points (CP)</label>
+                            <input type="number" ng-model="newEntry.cp">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Health Points (HP)</label>
+                            <input type="number" ng-model="newEntry.hp">
+                        </md-input-container>
+                    </div>
+
+                    <div layout-xs="column" layout="row">
+                        <div layout-xs="column" layout="row">
+                            <md-input-container class="md-block" flex>
+                                <label>Weight (kg)</label>
+                                <input type="number" ng-model="newEntry.weight">
+                            </md-input-container>
+
+                            <md-input-container class="md-block" >
+                                <md-radio-group ng-model="newEntry.weightMod">
+                                    <md-radio-button value=1>XS</md-radio-button>
+                                    <md-radio-button value=0 class="md-primary">Normal</md-radio-button>
+                                    <md-radio-button value=2>XL</md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                        </div>
+
+                        <div layout-xs="column" layout="row">
+                            <md-input-container class="md-block" flex>
+                                <label>Height (m)</label>
+
+                                <input type="number" ng-model="newEntry.height">
+                            </md-input-container>
+
+                            <md-input-container class="md-block">
+                                <md-radio-group ng-model="newEntry.heightMod">
+                                    <md-radio-button value=1 >XS</md-radio-button>
+                                    <md-radio-button value=0 class="md-primary">Normal</md-radio-button>
+                                    <md-radio-button value=2>XL</md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                        </div>
+                    </div>
+
+                    <div layout="row">
+                        <md-autocomplete flex
+                                ng-disabled="regAttackDisabled"
+                                md-no-cache="ctrl.noCache"
+                                md-selected-item="attackRegObj"
+                                md-search-text-change="ctrl.searchTextChange(searchRegAttackText)"
+                                md-search-text="searchRegAttackText"
+                                md-selected-item-change="ctrl.selectedAttackRegChange(item)"
+                                md-items="item in ctrl.queryRegAttackSearch(searchRegAttackText)"
+                                md-item-text="item.attack"
+                                md-min-length="0"
+                                placeholder="{{regAttackPlaceholder}}"
+                                md-menu-class="autocomplete-custom-template">
+                            <md-item-template>
+                              <span class="item-title" md-highlight-flags="^i">
+                                <md-icon md-svg-icon="img/moves/move{{item.type.toLowerCase()}}.svg"></md-icon>
+                                <span>{{item.attack}} </span><strong> {{item.damage}}</strong>
+                              </span>
+                            </md-item-template>
+                        </md-autocomplete>
+                        <md-button class="md-warn" ng-click="enableRegMoveFields()" >
+                            Move not Present
+                        </md-button>
+                    </div>
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <md-icon md-svg-icon="{{newEntry.attackRegTypeIcon}}"></md-icon>
+                            <label>Regular Attack</label>
+                            <input  ng-disabled="newEntry.attackRegEnabled" ng-model="newEntry.attackReg">
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Regular Attack Damage</label>
+                            <input type="number" ng-disabled="newEntry.attackRegEnabled" ng-model="newEntry.attackRegDmg">
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Regular Attack Type</label>
+                            <input ng-disabled="newEntry.attackRegEnabled" ng-model="newEntry.attackRegType">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+
+                        <md-autocomplete flex
+                                         ng-disabled="spAttackDisabled"
+                                         md-no-cache="ctrl.noCache"
+                                         md-selected-item="attackSpObj"
+                                         md-search-text-change="ctrl.searchTextChange(searchSpAttackText)"
+                                         md-search-text="searchSpAttackText"
+                                         md-selected-item-change="ctrl.selectedAttackSpChange(item)"
+                                         md-items="item in ctrl.querySpAttackSearch(searchSpAttackText)"
+                                         md-item-text="item.attack"
+                                         md-min-length="0"
+                                         placeholder="{{spAttackPlaceholder}}"
+                                         md-menu-class="autocomplete-custom-template">
+                            <md-item-template>
+                                      <span class="item-title" md-highlight-flags="^i">
+                                        <md-icon md-svg-icon="img/moves/move{{item.type.toLowerCase()}}.svg"></md-icon>
+                                        <span>{{item.attack}} </span><strong> {{item.damage}}</strong>
+                                      </span>
+                            </md-item-template>
+                        </md-autocomplete>
+                        <md-button class="md-warn" ng-click="enableSpMoveFields()" >
+                            Move not Present
+                        </md-button>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block">
+                            <md-icon md-svg-icon="{{newEntry.attackSpTypeIcon}}"></md-icon>
+
+                            <label>Special Attack</label>
+                            <input ng-disabled="newEntry.attackSpEnabled" ng-model="newEntry.attackSp">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <label>Special Attack Damage</label>
+                            <input type="number" ng-disabled="newEntry.attackSpEnabled" ng-model="newEntry.attackSpDmg">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <label>Special Attack Type</label>
+                            <input ng-disabled="newEntry.attackSpEnabled" ng-model="newEntry.attackSpType">
+                        </md-input-container>
+                    </div>
+                </form>
+            </div>
+        </md-card-content>
+        <md-card-actions layout="row" layout-align="center">
+            <md-button class="md-primary" ng-click="save()" flex >Save</md-button>
+        </md-card-actions>
+    </md-card>
+</div>

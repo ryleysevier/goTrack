@@ -1,0 +1,272 @@
+<div ng-controller="AnalysisCtlr as ctrl" layout="column" ng-cloak class="md-inline-form">
+
+    <md-card>
+        <md-card-title>
+            Pokemon Analysis - Determine Your Pokemon's IV's using this system.
+        </md-card-title>
+
+        <md-card-content>
+            <div>
+                <form name="userForm">
+
+                    <div layout-gt-xs="row">
+                        <md-input-container class="md-block" flex-gt-xs>
+                            <label>Trainer Level</label>
+                            <input type="number" ng-model="trainerLevel" ng-change="trainerLevelChange()">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-autocomplete flex
+                                         ng-disabled="newEntry.pokemonDisabled"
+                                         md-selected-item="ctrl.pokemonObj"
+                                         md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                                         md-search-text="ctrl.pokemonSearchText"
+                                         md-selected-item-change="ctrl.selectedItemChange(item)"
+                                         md-items="item in ctrl.pokemonQuerySearch(ctrl.pokemonSearchText)"
+                                         md-item-text="item.name"
+                                         md-min-length="0"
+                                         placeholder="Pokemon"
+                                         md-menu-class="autocomplete-pokemon-template">
+                            <md-item-template>
+                                <span class="item-title" md-highlight-flags="^i">
+                                    <md-icon md-svg-icon="img/pokemon151/vectorized/{{item.img}}.svg"></md-icon>
+                                    <strong>{{item.pokedex | numberFixedLen:3}} </strong>{{item.name}}
+
+                                </span>
+                            </md-item-template>
+                        </md-autocomplete>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block" flex>
+                            <label>Combat Points (CP)</label>
+                            <input type="number" ng-model="cp">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Health Points (HP)</label>
+                            <input type="number" ng-model="hp" ng-change="calculateBaseStamina()">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block">
+                            <md-checkbox ng-model="poweredUp" aria-label="Leveled Powered">
+                                Yes, Powered Up
+                            </md-checkbox>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Stardust Cost for Power Up</label>
+                            <md-select ng-model="stardustPowerUpCost" md-on-close="stardustCostChange()">
+                                <md-option ng-repeat="cost in stardustPowerUpCosts track by $index" ng-value="{{cost}}">
+                                    {{cost}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block" flex>
+                            <label>Pokemon Attack</label>
+                            <input type="number" disabled ng-model="pokemonAttack">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Pokemon Defense</label>
+                            <input type="number" disabled ng-model="pokemonDefense">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Pokemon Special Attack</label>
+                            <input type="number" disabled ng-model="pokemonSpecialAttack">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Pokemon Special Defense</label>
+                            <input type="number" disabled ng-model="pokemonSpecialDefense">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Pokemon Speed</label>
+                            <input type="number" disabled ng-model="pokemonSpeed">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>Base Attack</label>
+                            <md-tooltip md-direction="top">
+                                This is calculated with 2 * ((Attack * Special Attack)^0.5 + Speed^0.5))
+                            </md-tooltip>
+                            <input type="number" disabled ng-model="baseAttack">
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Base Defense</label>
+                            <md-tooltip md-direction="top">
+                                This is calculated with 2 * ((Defense * Special Defense)^0.5 + Speed^0.5))
+                            </md-tooltip>
+                            <input type="number" disabled ng-model="baseDefense">
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Base Stamina</label>
+                            <md-tooltip md-direction="top">
+                                This is calculated with 2 * Health Points (HP)
+                            </md-tooltip>
+                            <input type="number" disabled ng-model="baseStamina">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block" flex>
+                            <md-tooltip md-direction="top">
+                                TODO: FILL IN THIS TOOL TIP
+                            </md-tooltip>
+                            <label>Lowest Possible # of Power Ups</label>
+                            <input type="number" disabled ng-model="lowestPowerUps">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <md-tooltip md-direction="top">
+                                TODO: FILL IN THIS TOOL TIP
+                            </md-tooltip>
+                            <label>Highest Possible # of Power Ups</label>
+                            <input type="number" disabled ng-model="highestPowerUps">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block" flex>
+                            <md-tooltip md-direction="top">
+                                Based on the current Stardust Cost for Power Up, the minimum CP multiplier is determined by the lowest level value in that range.
+                            </md-tooltip>
+                            <label>Lowest Possible CP Multiplier</label>
+                            <input type="number" disabled ng-model="lowestCPMultiplier">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <md-tooltip md-direction="top">
+                                Based on the current Stardust Cost for Power Up, the maximum CP multiplier is determined by the highest level value in that range.
+                            </md-tooltip>
+                            <label>Highest Possible CP Multiplier</label>
+                            <input type="number" disabled ng-model="highestCPMultiplier">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>CP Multiplier</label>
+                            <input type="number" disabled ng-model="cpMultiplier">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <md-tooltip md-direction="top">
+                                Adding levels to the addition CP Multiplier that you caught it at.
+                            </md-tooltip>
+                            <label>Additional CP Multiplier</label>
+                            <input type="number" disabled ng-model="additionalCPMultiplier">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <label>Total CP Multiplier</label>
+                            <input type="number" disabled ng-model="totalCPMultiplier">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>Attack</label>
+                            <input type="number" disabled ng-model="attack">
+                            <md-tooltip md-direction="top">
+                                (Base Attack + Individual Attack) * Total_CP_Multiplier
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Defense</label>
+                            <input type="number" disabled ng-model="defense">
+                            <md-tooltip md-direction="top">
+                                (Base Defense + Individual Defense) * Total_CP_Multiplier
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Stamina</label>
+                            <input type="number" disabled ng-model="stamina">
+                            <md-tooltip md-direction="top">
+                                (Base Stamina + Individual Stamina) * Total_CP_Multiplier
+                            </md-tooltip>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>Individual Attack</label>
+                            <input type="number" disabled ng-model="attackIV">
+                            <md-tooltip md-direction="top">
+                                (Attack / Total CP Multiplier) - Base Attack
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Individual Defense</label>
+                            <input type="number" disabled ng-model="defenseIV">
+                            <md-tooltip md-direction="top">
+                                (Defense / Total CP Multiplier) - Base Defense
+                            </md-tooltip>
+                        </md-input-container>
+
+                        </md-input-container><md-input-container class="md-block">
+                            <label>Individual Stamina</label>
+                            <input type="number" disabled ng-model="staminaIV">
+                            <md-tooltip md-direction="top">
+                                (Stamina / Total CP Multiplier) - Base Stamina
+                            </md-tooltip>
+                        </md-input-container>
+                    </div>
+
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>Current Pokemon Level</label>
+                            <input type="number" disabled ng-model="currentLevel">
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Pokemon Max Level</label>
+                            <input type="number" disabled ng-model="maximumLevel">
+                            <md-tooltip md-direction="top">
+                                This is calculated directly from your trainer level
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Stamina (IV)</label>
+                            <input type="number" disabled ng-model="stamina">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" flex>
+                        <md-input-container class="md-block">
+                            <label>Max CP for Pokemon</label>
+                            <input type="number" disabled ng-model="maxPokemonCP">
+                            <md-tooltip md-direction="top">
+                                This is calculated with max IV's and at trainer level 40
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <md-input-container class="md-block">
+                            <label>Pokemon Max Level</label>
+                            <input type="number" disabled ng-model="maximumLevel">
+                            <md-tooltip md-direction="top">
+                                Trainer Level + 1.5
+                            </md-tooltip>
+                        </md-input-container>
+
+                    </div>
+
+                </form>
+            </div>
+        </md-card-content>
+        <md-card-actions layout="row" layout-align="center">
+        </md-card-actions>
+    </md-card>
+</div>
